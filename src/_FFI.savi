@@ -1,0 +1,21 @@
+:module _FFI
+  :ffi pony_asio_event_create(
+    actor AsioEvent.Actor
+    fd U32
+    flags U32
+    nsec U64
+    noisy Bool
+  ) AsioEvent.ID
+
+  :ffi pony_asio_event_setnsec(
+    event_id AsioEvent.ID
+    nsec U64
+  ) U32
+
+  :ffi pony_asio_event_unsubscribe(
+    event_id AsioEvent.ID
+  ) None
+
+  :ffi pony_asio_event_destroy(
+    event_id AsioEvent.ID
+  ) None

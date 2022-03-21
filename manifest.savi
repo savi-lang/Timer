@@ -1,0 +1,22 @@
+:manifest lib Timer
+  :sources "src/*.savi"
+
+  :dependency Time v0
+    :from "github:savi-lang/Time"
+
+:manifest bin "spec"
+  :copies Timer
+  :sources "spec/*.savi"
+
+  :dependency Spec v0
+    :from "github:savi-lang/Spec"
+    :depends on Map
+
+  :transitive dependency Map v0
+    :from "github:savi-lang/Map"
+
+// A simple program used for integration testing, which prints a series of
+// numbers showing how much time has passed between ticks, then exits.
+:manifest bin "integration-ticker"
+  :copies Timer
+  :sources "spec/integration/ticker/*.savi"

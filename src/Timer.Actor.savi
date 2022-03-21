@@ -1,0 +1,10 @@
+:trait tag Timer.Actor
+  :is AsioEvent.Actor
+  :fun timer @->(Timer.Engine)
+  :fun ref timer_react @
+
+  :be dispose
+    @timer.dispose
+
+  :be _asio_event(event AsioEvent)
+    @timer.react(event) -> (@timer_react)

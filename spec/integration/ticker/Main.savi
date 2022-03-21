@@ -1,0 +1,32 @@
+:actor Main
+  :new (env Env)
+    Ticker.new(env)
+
+:actor Ticker
+  :is Timer.Actor
+  :let env Env
+  :let timer Timer.Engine
+
+  // Print 50 ticks, with 100ms per tick.
+  :const finish_tick_count U64: 50
+  :const tick_milliseconds U64: 100
+  :var tick_count U64: 0
+
+  :new (@env)
+    @timer = Timer.Engine.new(@, Time.Duration.milliseconds(@tick_milliseconds))
+
+  :fun ref timer_react @
+    // Print the number of milliseconds since the last tick, rounded to the
+    // nearest 10 milliseconds. We round this way because we want to be
+    // able to show a stable number across each tick for testing, while
+    // the elapsed time sometimes varies at the individual millisecond level.
+    try (
+      rounded_milliseconds = (@timer.elapsed.total_milliseconds! + 5) / 10 * 10
+      @env.out.print(Inspect[rounded_milliseconds])
+    )
+
+    // Dispose of the timer after it has done the requested number of ticks.
+    @tick_count += 1
+    if (@tick_count >= @finish_tick_count) @dispose
+
+    @
