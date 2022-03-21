@@ -46,3 +46,20 @@ jobs:
   #
   # Add any custom jobs you need below this comment.
   # The area above this comment is reserved for future standard jobs.
+
+  # Run some integration tests using a binary that prints ticks on a timer.
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: savi-lang/action-install@v1.0.0
+      - run: savi deps update --for integration-ticker
+      - run: savi build integration-ticker
+
+      - name: Check timer ticks output
+        run: |
+          bin/integration-ticker | tee /tmp/integration-ticker-output
+          printf "number of ticks: "
+          wc -l < /tmp/integration-ticker-output | grep 50
+          printf "number of accurate ticks: "
+          cat /tmp/integration-ticker-output | grep 100 | wc -l | grep 50

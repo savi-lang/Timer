@@ -1,0 +1,43 @@
+:class Timer.Engine
+  :let _event_id AsioEvent.ID
+  :var _elapsed_nanos U64: 0
+  :var _interval_nanos U64
+  :var _last_react_nanos U64
+  :var _next_react_nanos U64
+
+  :new (actor Timer.Actor, interval Time.Duration)
+    @_interval_nanos = nanos = try (interval.total_nanoseconds! | U64.max_value)
+    @_last_react_nanos = Time.Measure.current_nanoseconds
+    @_next_react_nanos = @_last_react_nanos + @_interval_nanos
+    @_event_id =
+      _FFI.pony_asio_event_create(actor, 0, AsioEvent.Flags.timer, nanos, True)
+
+  :fun ref "interval="(interval Time.Duration)
+    @_interval_nanos = try (interval.total_nanoseconds! | U64.max_value)
+    @_next_react_nanos = Time.Measure.current_nanoseconds + @_interval_nanos
+    _FFI.pony_asio_event_setnsec(@_event_id, @_interval_nanos)
+
+  :fun ref dispose
+    _FFI.pony_asio_event_unsubscribe(@_event_id)
+
+  :: The time that has elapsed since the last firing of the timer.
+  :: On the first firing of the timer, it indicates the time since creation.
+  :: Immediately after creation (before the first firing) it is zero.
+  :fun elapsed: Time.Duration.nanoseconds(@_elapsed_nanos)
+
+  :fun ref react(event AsioEvent)
+    case (
+    | event.is_disposable |
+      _FFI.pony_asio_event_destroy(event.id)
+    | event.id === @_event_id  |
+      current = Time.Measure.current_nanoseconds
+      @_elapsed_nanos = current - @_last_react_nanos
+      @_last_react_nanos = current
+
+      yield None
+
+      @_next_react_nanos += @_interval_nanos
+      wait_nanos =
+        try (@_next_react_nanos -! Time.Measure.current_nanoseconds | 1)
+      _FFI.pony_asio_event_setnsec(event.id, wait_nanos)
+    )
