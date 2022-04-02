@@ -17,11 +17,11 @@
 
   :fun ref timer_react @
     // Print the number of milliseconds since the last tick, rounded to the
-    // nearest 10 milliseconds. We round this way because we want to be
+    // nearest 20 milliseconds. We round this way because we want to be
     // able to show a stable number across each tick for testing, while
     // the elapsed time sometimes varies at the individual millisecond level.
     try (
-      rounded_milliseconds = (@timer.elapsed.total_milliseconds! + 5) / 10 * 10
+      rounded_milliseconds = (@timer.elapsed.total_milliseconds! + 10) / 20 * 20
       @env.out.print(Inspect[rounded_milliseconds])
     )
 
