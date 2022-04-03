@@ -11,9 +11,15 @@
   :dependency Spec v0
     :from "github:savi-lang/Spec"
     :depends on Map
+    :depends on Time
+    :depends on Timer
 
   :transitive dependency Map v0
     :from "github:savi-lang/Map"
+
+  :transitive dependency Timer v0
+    :from "github:savi-lang/Timer"
+    :depends on Time
 
 // A simple program used for integration testing, which prints a series of
 // numbers showing how much time has passed between ticks, then exits.
