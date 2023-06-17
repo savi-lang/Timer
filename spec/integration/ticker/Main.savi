@@ -27,6 +27,6 @@
 
     // Dispose of the timer after it has done the requested number of ticks.
     @tick_count += 1
-    if (@tick_count >= @finish_tick_count) @dispose
+    if @tick_count >= @finish_tick_count @dispose
 
     @
